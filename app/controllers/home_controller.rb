@@ -45,14 +45,16 @@ class HomeController < ApplicationController
   
     # Load provinces for the dropdown
     @provinces = Province.all
+
   end
   
 
   def checkout
-    session[:checkout] = nil
+    # Reset the session checkout details
     session[:checkout] = []
-
-    @province   = Province.where(:id => params[:province])
+    
+    # Fetch the province object directly
+    @province   = Province.find(params[:province])
     @first_name = params[:first_name]
     @last_name  = params[:last_name]
     @email      = params[:email]
@@ -60,13 +62,18 @@ class HomeController < ApplicationController
     @city       = params[:city]
     @postal     = params[:postal]
     
-    session[:checkout] << params[:province]
+    # Store checkout details in the session
+    session[:checkout] << @province.id
     session[:checkout] << @first_name
     session[:checkout] << @last_name
     session[:checkout] << @email
     session[:checkout] << @address
     session[:checkout] << @city
     session[:checkout] << @postal
+    
+    # Get the products in the cart by their IDs
+    product_ids = session[:cart].keys
+    @cart_products = Product.where(id: product_ids)
   end
 
   def create
