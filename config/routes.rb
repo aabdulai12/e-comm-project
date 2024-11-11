@@ -4,6 +4,7 @@ RailsEcommProject::Application.routes.draw do
   get "home/index"
   root 'home#index' # Defines the root route
   get 'products/search', to: 'products#search', as: 'product_search'
+  patch 'update_cart/:id', to: 'home#update_cart', as: 'update_cart'
 
   # Route to product pages
   get 'home/:id', to: 'home#show', as: :store_product
