@@ -1,0 +1,17 @@
+<h2>Search Results</h2>
+
+<% if @products.empty? %>
+
+	<div class="jumbotron">
+        <h1>No Results Found!</h1>
+        <p>Your search for '<%= params[:keywords] %>' has yielded you with not results my friend..</p>
+        <p>
+        	<%= link_to 'Take me home!', root_path, :class => "btn btn-lg btn-danger" %>
+   		</p>
+    </div>
+
+<% end %>
+
+<%= render @products %>
+
+<div class="pagination-div"><%= paginate @products, :window => 2, :params => { :controller => 'home', :action => 'search_results', _: nil, _method: nil, authenticity_token: nil, utf8: nil} %></div>

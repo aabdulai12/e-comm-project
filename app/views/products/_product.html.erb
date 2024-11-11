@@ -1,0 +1,43 @@
+<div class="customer col-md-4 panel panel-primary">
+  <section class="product">
+    <div class="panel-heading">
+      <% if product.sale_price %>
+        <p><span class="label label-success sale-icon">On Sale!</span></p>
+      <% end %>
+      
+      <% if product.stock_quantity.zero? %>
+        <p><span class="label label-primary sold-out-icon">SOLD OUT</span></p>
+      <% end %>
+      
+      <h2><%= link_to product.name, store_product_path(product) %></h2>
+    </div>
+
+    <div class="panel-body">
+	<div class="product-img-div">
+	<% if product.image.exists? %>
+	  <p><%= image_tag CGI.unescape(product.image.url(:thumb)) %></p>
+	<% else %>
+	  <p><%= image_tag "default.gif" %></p> <!-- Default image in app/assets/images -->
+	<% end %>
+  </div>
+  
+
+      <% if product.category %>
+        <strong>Category:</strong> <%= product.category.title %>
+      <% end %>
+
+      <% if product.sale_price %>
+        <p><span class="salePrice"><%= number_to_currency product.sale_price %></span> <span class="oldPrice"><%= number_to_currency product.price %></span></p>
+      <% else %>
+        <p><%= number_to_currency product.price %></p>
+      <% end %>
+
+      <!-- Add to cart button -->
+      <% if product.stock_quantity.zero? %>
+        <button type="button" class="btn btn-primary disabled">SOLD OUT</button>
+      <% else %>
+        <%= link_to "Add To Cart", add_product_path(product.id), class: "product-btn btn btn-info" %>
+      <% end %>
+    </div>
+  </section>
+</div>

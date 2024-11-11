@@ -1,0 +1,5 @@
+<%= form_with url: search_results_path, method: :get, class: "form-inline" do %>
+	<%= text_field_tag :keywords, params[:keywords], placeholder: "Enter your search query here" %>
+	<%= submit_tag "Search", class: "btn btn-default" %>
+  <% end %>
+  
