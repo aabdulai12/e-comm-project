@@ -2,9 +2,7 @@ RailsEcommProject::Application.routes.draw do
   mount Ckeditor::Engine => '/ckeditor'
 
   get "home/index"
-
-  # Index of the site
-  root to: "home#index"
+  root 'home#index' # Defines the root route
 
   # Route to product pages
   get 'home/:id', to: 'home#show', as: :store_product
@@ -22,7 +20,7 @@ RailsEcommProject::Application.routes.draw do
   get 'search_results', to: 'home#search_results', as: 'search_results'
   post 'search_results', to: 'home#search_results'
 
-  # Shopping cart route
+  # Shopping cart routes
   get 'cart', to: 'home#cart', as: 'cart'
   get 'empty', to: 'home#empty_cart', as: 'empty_cart'
   get 'add_product/:id', to: 'home#add_product', as: 'add_product'
@@ -36,6 +34,4 @@ RailsEcommProject::Application.routes.draw do
 
   # Legacy catch-all route
   # match ':controller(/:action(/:id))(.:format)', via: :all
-
-  # root :to => "home#index"
 end

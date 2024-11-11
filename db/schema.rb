@@ -142,11 +142,11 @@ ActiveRecord::Schema.define(version: 2024_11_07_163205) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "category_id"
-    t.decimal "sale_price"
     t.string "image_file_name"
     t.string "image_content_type"
     t.integer "image_file_size"
     t.datetime "image_updated_at"
+    t.decimal "sale_price"
   end
 
   create_table "provinces", force: :cascade do |t|

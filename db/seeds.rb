@@ -1,4 +1,4 @@
-require 'faker'
+#require 'faker'
 require 'csv'
 
 # Define Categories
@@ -10,16 +10,16 @@ category_records = categories.map { |category| Category.find_or_create_by(name: 
 puts "Categories seeded: #{category_records.map(&:name).join(', ')}"
 
 # Seed with Faker (e.g., 100 products)
-100.times do
-  product = Product.create!(
-    name: Faker::Commerce.product_name,
-    description: Faker::Lorem.sentence(word_count: 15),
-    price: Faker::Commerce.price(range: 10.0..1000.0),
-    category: category_records.sample,
-    stock_quantity: rand(1..50)
-  )
-  puts "Faker product created: #{product.name} in category #{product.category.name}"
-end
+#100.times do
+  #product = Product.create!(
+   # name: Faker::Commerce.product_name,
+   # description: Faker::Lorem.sentence(word_count: 15),
+   # price: Faker::Commerce.price(range: 10.0..1000.0),
+   # category: category_records.sample,
+  #  stock_quantity: rand(1..50)
+  #)
+  #puts "Faker product created: #{product.name} in category #{product.category.name}"
+#end
 
 # Seed from CSV file (if using CSV data)
 csv_path = Rails.root.join('db', 'products.csv')
