@@ -1,5 +1,13 @@
-<%= form_with url: search_results_path, method: :get, class: "form-inline" do %>
-	<%= text_field_tag :keywords, params[:keywords], placeholder: "Enter your search query here" %>
-	<%= submit_tag "Search", class: "btn btn-default" %>
-  <% end %>
+<%= form_with url: search_results_path, method: :get, local: true, class: "form-inline" do |f| %>
+	<div class="form-group">
+	  <%= f.label :keywords, "Search Products" %>
+	  <%= f.text_field :keywords, class: "form-control", placeholder: "Enter keywords" %>
+	</div>
   
+	<div class="form-group">
+	  <%= f.label :category, "Select Category" %>
+	  <%= f.collection_select :category_id, Category.all, :id, :name, { include_blank: "All Categories" }, class: "form-control" %>
+	</div>
+  
+	<%= f.submit "Search", class: "btn btn-primary" %>
+  <% end %>
