@@ -63,18 +63,19 @@ Province.create([
 
 # Update each province with its GST, PST, and HST rates
 
-Province.find_by(name: 'Alberta').update(gst: 0.05, pst: 0.08, hst: 0)
-Province.find_by(name: 'British Columbia').update(gst: 0.05, pst: 0.07, hst: 0.8)
+Province.find_by(name: 'Alberta').update(gst: 0.05, pst: 0.0, hst: 0)
+Province.find_by(name: 'British Columbia').update(gst: 0.05, pst: 0.07, hst: 0)
 Province.find_by(name: 'Manitoba').update(gst: 0.05, pst: 0.07, hst: 0)
-Province.find_by(name: 'New Brunswick').update(gst: 0.3, pst: 0, hst: 0.15)
-Province.find_by(name: 'Newfoundland and Labrador').update(gst: 0.7, pst: 0, hst: 0.15)
+Province.find_by(name: 'New Brunswick').update(gst: 0, pst: 0, hst: 0.15)
+Province.find_by(name: 'Newfoundland and Labrador').update(gst: 0, pst: 0, hst: 0.15)
 Province.find_by(name: 'Nova Scotia').update(gst: 0, pst: 0, hst: 0.15)
-Province.find_by(name: 'Ontario').update(gst: 0.4, pst: 0, hst: 0.13)
-Province.find_by(name: 'Prince Edward Island').update(gst: 0, pst: 0.08, hst: 0.15)
+Province.find_by(name: 'Ontario').update(gst: 0, pst: 0, hst: 0.13)
+Province.find_by(name: 'Prince Edward Island').update(gst: 0, pst: 0, hst: 0.15)
 Province.find_by(name: 'Quebec').update(gst: 0.05, pst: 0.09975, hst: 0)
 Province.find_by(name: 'Saskatchewan').update(gst: 0.05, pst: 0.06, hst: 0)
-Province.find_by(name: 'Northwest Territories').update(gst: 0.05, pst: 0, hst: 0.7)
-Province.find_by(name: 'Nunavut').update(gst: 0.05, pst: 0.97, hst: 0)
-Province.find_by(name: 'Yukon').update(gst: 0.05, pst: 0, hst: 0.78)
+Province.find_by(name: 'Northwest Territories').update(gst: 0.05, pst: 0, hst: 0)
+Province.find_by(name: 'Nunavut').update(gst: 0.05, pst: 0, hst: 0)
+Province.find_by(name: 'Yukon').update(gst: 0.05, pst: 0, hst: 0)
+
 
 puts "All provinces and territories updated with tax rates."

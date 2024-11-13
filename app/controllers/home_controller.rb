@@ -48,33 +48,43 @@ class HomeController < ApplicationController
 
   end
   
-
   def checkout
-    # Reset the session checkout details
+    # Reset session checkout details
     session[:checkout] = []
+  
+    # Find the province by ID passed from the form
+    @province = Province.find_by(id: params[:province])
+    if @province.nil?
+      flash[:error] = "Please select a valid province."
+      redirect_to cart_path and return
+    end
     
-    # Fetch the province object directly
-    @province   = Province.find(params[:province])
+    # Set up user details from params
     @first_name = params[:first_name]
     @last_name  = params[:last_name]
     @email      = params[:email]
     @address    = params[:address]
     @city       = params[:city]
     @postal     = params[:postal]
-    
-    # Store checkout details in the session
-    session[:checkout] << @province.id
-    session[:checkout] << @first_name
-    session[:checkout] << @last_name
-    session[:checkout] << @email
-    session[:checkout] << @address
-    session[:checkout] << @city
-    session[:checkout] << @postal
-    
-    # Get the products in the cart by their IDs
+  
+    # Retrieve cart products and calculate subtotal
     product_ids = session[:cart].keys
     @cart_products = Product.where(id: product_ids)
+    subtotal = @cart_products.sum { |product| product.price * session[:cart][product.id.to_s].to_i }
+  
+    # Calculate taxes based on the selected province
+    @gst_total = @province.gst ? subtotal * @province.gst : 0
+    @pst_total = @province.pst ? subtotal * @province.pst : 0
+    @hst_total = @province.hst ? subtotal * @province.hst : 0
+    @total_amount = subtotal + @gst_total + @pst_total + @hst_total
+    @subtotal = subtotal
+  
+    # Debugging output to verify calculations
+    Rails.logger.debug("Checkout Calculation - Subtotal: #{@subtotal}, GST: #{@gst_total}, PST: #{@pst_total}, HST: #{@hst_total}, Total: #{@total_amount}")
+    Rails.logger.debug("PST: #{@province.pst}, GST: #{@province.gst}, HST: #{@province.hst}")
   end
+  
+  
 
   def create
     # Grab the data passed through the session
