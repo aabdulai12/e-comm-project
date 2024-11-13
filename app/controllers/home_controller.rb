@@ -154,16 +154,21 @@ class HomeController < ApplicationController
   end
 
   def add_product
-    # Ensure session[:cart] is a hash with string keys
-    session[:cart] ||= {}
     product_id = params[:id].to_s
   
-    # Increment quantity if product already in cart, or set it to 1
-    session[:cart][product_id] = session[:cart][product_id].to_i + 1
+    # Force `session[:cart]` to be a hash if it's not already one
+    unless session[:cart].is_a?(Hash)
+      session[:cart] = {}
+    end
+  
+    # Safely increment the product's quantity or initialize it to 1 if not present
+    session[:cart][product_id] = (session[:cart][product_id].to_i || 0) + 1
   
     flash[:success_message] = "The product has been added to your cart!"
     redirect_to root_path
   end
+  
+  
 
   def remove_product
     id = params[:id].to_i

@@ -1,19 +1,29 @@
 RailsEcommProject::Application.routes.draw do
+  # Devise user authentication
+  devise_for :users
+  devise_for :admin_users, ActiveAdmin::Devise.config
+  ActiveAdmin.routes(self)
+
+  # CKEditor
   mount Ckeditor::Engine => '/ckeditor'
 
-  get "home/index"
-  root 'home#index' # Defines the root route
+  # Root route
+  root 'home#index' # Defines the homepage
+  
+
+  # Home and product-related routes
+  get 'home/index'
   get 'products/search', to: 'products#search', as: 'product_search'
   patch 'update_cart/:id', to: 'home#update_cart', as: 'update_cart'
-
-  # Route to product pages
+  
+  # Route to product detail page
   get 'home/:id', to: 'home#show', as: :store_product
 
-  # Route to pages
+  # Static pages
   get 'page/:id', to: 'home#page', as: 'page'
   get 'search/:id', to: 'search#category', as: 'category'
 
-  # On Sale
+  # Sales and new products
   get 'sale', to: 'home#sale', as: 'sale'
   get 'new', to: 'home#new', as: 'new'
 
@@ -31,9 +41,5 @@ RailsEcommProject::Application.routes.draw do
   post 'create', to: 'home#create', as: 'create'
   get 'edit_cart', to: 'home#edit_cart', as: 'edit_cart'
 
-  devise_for :admin_users, ActiveAdmin::Devise.config
-  ActiveAdmin.routes(self)
-
-  # Legacy catch-all route
-  # match ':controller(/:action(/:id))(.:format)', via: :all
+  # Remove legacy catch-all route as it’s no longer recommended in Rails.
 end

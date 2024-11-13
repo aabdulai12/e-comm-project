@@ -4,7 +4,8 @@ source 'https://rubygems.org'
 gem 'rails', '~> 6.1.7'
 # Gemfile
 gem 'faker'
-
+gem 'devise'
+gem 'redis-rails'
 gem 'httparty'
 # Gemfile
 gem 'nokogiri', '1.13.1'
