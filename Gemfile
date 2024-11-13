@@ -10,6 +10,8 @@ gem 'httparty'
 # Gemfile
 gem 'nokogiri', '1.13.1'
 
+gem 'redis-rails'
+gem 'dotenv-rails', groups: [:development, :test]
 
 # Core dependencies
 gem 'excon', '~> 0.80'

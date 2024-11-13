@@ -3,11 +3,13 @@
 <%= form_for(resource, as: resource_name, url: url_for([resource_name, :registration])) do |f| %>
   <%= devise_error_messages! %>
 
+  <!-- Email Field -->
   <div class="form-group">
     <%= f.label :email %><br />
     <%= f.email_field :email, autofocus: true, class: 'form-control' %>
   </div>
 
+  <!-- Password Fields -->
   <div class="form-group">
     <%= f.label :password %><br />
     <%= f.password_field :password, autocomplete: "new-password", class: 'form-control' %>
@@ -18,6 +20,24 @@
     <%= f.password_field :password_confirmation, autocomplete: "new-password", class: 'form-control' %>
   </div>
 
+  <!-- Address Fields -->
+  <div class="form-group">
+    <%= f.label :address %><br />
+    <%= f.text_field :address, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :city %><br />
+    <%= f.text_field :city, class: 'form-control' %>
+  </div>
+
+  <!-- Province Field -->
+  <div class="form-group">
+    <%= f.label :province %><br />
+    <%= f.collection_select :province_id, Province.all, :id, :name, { prompt: "Select your province" }, class: 'form-control' %>
+  </div>
+
+  <!-- Submit Button -->
   <div class="actions">
     <%= f.submit "Sign up", class: "btn btn-primary" %>
   </div>

@@ -1,6 +1,9 @@
 class Order < ActiveRecord::Base
   belongs_to :customer
   belongs_to :status
+  belongs_to :user
+  has_many :line_items
+  belongs_to :province
   has_many :line_items
 
   validates :status_id,   :presence => true

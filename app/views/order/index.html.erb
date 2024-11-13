@@ -1,0 +1,32 @@
+<h2>My Orders</h2>
+
+<% @orders.each do |order| %>
+  <div class="order">
+    <h3>Order ##{order.id}</h3>
+    <p>Date: <%= order.created_at.strftime("%Y-%m-%d") %></p>
+    <p>Province: <%= order.province.name %></p>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% order.line_items.each do |line_item| %>
+          <tr>
+            <td><%= line_item.product.name %></td>
+            <td><%= line_item.quantity %></td>
+            <td><%= number_to_currency(line_item.price) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <p>GST: <%= number_to_currency(order.gst_amount) %></p>
+    <p>PST: <%= number_to_currency(order.pst_amount) %></p>
+    <p>HST: <%= number_to_currency(order.hst_amount) %></p>
+    <p><strong>Grand Total: <%= number_to_currency(order.total_amount) %></strong></p>
+  </div>
+<% end %>

@@ -15,7 +15,8 @@ RailsEcommProject::Application.routes.draw do
   get 'home/index'
   get 'products/search', to: 'products#search', as: 'product_search'
   patch 'update_cart/:id', to: 'home#update_cart', as: 'update_cart'
-  
+  resources :orders, only: [:index]
+
   # Route to product detail page
   get 'home/:id', to: 'home#show', as: :store_product
 

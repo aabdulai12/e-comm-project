@@ -31,6 +31,22 @@
     <%= f.password_field :current_password, autocomplete: "current-password" %>
   </div>
 
+  <!-- New fields for address, city, and province -->
+  <div class="field">
+    <%= f.label :address %><br />
+    <%= f.text_field :address, autocomplete: "street-address" %>
+  </div>
+
+  <div class="field">
+    <%= f.label :city %><br />
+    <%= f.text_field :city, autocomplete: "address-level2" %>
+  </div>
+
+  <div class="field">
+    <%= f.label :province %><br />
+    <%= f.collection_select :province_id, Province.all, :id, :name, { prompt: "Select your province" }, class: "form-control" %>
+  </div>
+
   <div class="actions">
     <%= f.submit "Update" %>
   </div>
