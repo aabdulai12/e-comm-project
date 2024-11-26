@@ -10,7 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_11_13_101053) do
+
+
+
+#price Preservation: Prices are recorded in the Line Items table at the time of the transaction, 
+#ensuring that any future changes to product pricing do not affect historical order data.
+
+#Tax Rate Preservation: Tax rates are stored with each order, allowing you to see exactly what tax rates were applied at the time of each purchase.
+
+
+
+ActiveRecord::Schema.define(version: 2024_11_13_160101) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string "resource_id", null: false
@@ -125,6 +135,8 @@ ActiveRecord::Schema.define(version: 2024_11_13_101053) do
     t.integer "customer_id"
     t.float "order_total"
     t.integer "status_id"
+    t.integer "user_id"
+    t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
   create_table "pages", force: :cascade do |t|
@@ -182,6 +194,9 @@ ActiveRecord::Schema.define(version: 2024_11_13_101053) do
     t.datetime "remember_created_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "address"
+    t.string "city"
+    t.integer "province_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

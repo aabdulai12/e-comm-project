@@ -1,6 +1,6 @@
 class Customer < ActiveRecord::Base
   belongs_to :province
-
+  belongs_to :province
   has_many :reviews
   has_many :orders
 
@@ -10,7 +10,7 @@ class Customer < ActiveRecord::Base
   validates :city,       :presence => true
   validates :email,      :presence => true
   validates :postal_code,:presence => true
-  
+  validates :province, presence: true
   validates :province_id,:presence => true,
                          :numericality => true
 

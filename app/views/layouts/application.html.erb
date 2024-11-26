@@ -4,9 +4,18 @@
   <title>GreenShop</title>
   <%= stylesheet_link_tag "application", media: "all" %>
   <%= javascript_include_tag "application" %>
+  
   <%= csrf_meta_tags %>
 </head>
 <body>
+
+  <!-- Flash Messages Section -->
+  <% flash.each do |type, message| %>
+    <div class="alert <%= "alert-#{type == 'notice' ? 'info' : 'danger'}" %>">
+      <%= message %>
+    </div>
+  <% end %>
+
   <header>
     <% categories = Category.all %>
     <% pages = Page.all %>
@@ -35,6 +44,7 @@
               <% if current_user.email == "admin@example.com" %>
                 <li><%= link_to 'Admin Dashboard', admin_dashboard_path %></li>
               <% end %>
+              <li><%= link_to 'My Orders', orders_path %></li>
               <li><%= link_to 'My Account', edit_user_registration_path %></li>
               <li><%= link_to 'Logout', destroy_user_session_path, method: :delete, data: { confirm: 'Are you sure you want to log out?' } %></li>
             <% else %>

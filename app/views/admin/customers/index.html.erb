@@ -1,0 +1,14 @@
+<!-- app/views/admin/customers/index.html.erb -->
+<h2>Customer Orders</h2>
+<% @customers.each do |customer| %>
+  <h3>Customer: <%= customer.first_name %> <%= customer.last_name %> - <%= customer.email %></h3>
+  <% customer.orders.each do |order| %>
+    <p>Order #<%= order.id %> - Total: <%= number_to_currency(order.order_total) %></p>
+    <ul>
+      <% order.line_items.each do |line_item| %>
+        <li><%= line_item.product.name %> - Qty: <%= line_item.quantity %> - Price: <%= number_to_currency(line_item.price) %></li>
+      <% end %>
+    </ul>
+    <p>GST: <%= number_to_currency(order.gst_amount) %>, PST: <%= number_to_currency(order.pst_amount) %>, HST: <%= number_to_currency(order.hst_amount) %></p>
+  <% end %>
+<% end %>

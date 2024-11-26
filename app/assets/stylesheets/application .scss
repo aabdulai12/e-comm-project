@@ -1,0 +1,49 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or vendor/assets/stylesheets of plugins, if any, can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the top of the
+ * compiled file, but it's generally better to create a new file per style scope.
+ *
+ *= require_self
+ *= require_tree .
+ 
+ */
+// Customize Bulma's color variables
+$primary: #00d1b2; // Turquoise, default primary color in Bulma
+$link: #3273dc; // Blue
+$info: #209cee; // Cyan
+$success: #23d160; // Green
+$warning: #ffdd57; // Yellow
+$danger: #ff3860; // Red
+
+
+
+.navbar {
+  background-color: $primary;
+  .navbar-item {
+    color: $link;
+    &:hover {
+      background-color: $info;
+    }
+  }
+}
+
+.footer {
+ // background-color: $dark;
+  //color: $light;
+}
+
+.notification {
+  &.is-info { background-color: $info; }
+  &.is-danger { background-color: $danger; }
+}
+
+ .quantity-input {
+    width: 60px;
+    text-align: center;
+  }
+  

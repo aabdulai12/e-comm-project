@@ -47,109 +47,239 @@ class HomeController < ApplicationController
     @provinces = Province.all
 
   end
+
+  
   
   def checkout
-    # Reset session checkout details
+      Rails.logger.info "Stripe Public Key: #{Rails.application.credentials.dig(:stripe, :public_key)}"
+    # Ensure session checkout details are reset
     session[:checkout] = []
   
-    # Find the province by ID passed from the form
-    @province = Province.find_by(id: params[:province])
-    if @province.nil?
-      flash[:error] = "Please select a valid province."
+    # Fetch user input from params
+    @first_name = params[:first_name]
+    @last_name = params[:last_name]
+    @address = params[:address]
+    @province_id = params[:province]
+    @city = params[:city]
+    @email = params[:email]
+    @postal = params[:postal]
+  
+
+    
+
+    # Validate that all fields are provided
+    if [@first_name, @last_name, @address, @province_id, @city, @email, @postal].any?(&:blank?)
+      flash[:error] = "Please fill in all required fields."
       redirect_to cart_path and return
     end
-    
-    # Set up user details from params
-    @first_name = params[:first_name]
-    @last_name  = params[:last_name]
-    @email      = params[:email]
-    @address    = params[:address]
-    @city       = params[:city]
-    @postal     = params[:postal]
+  
+    # Find and set @province
+    @province = Province.find_by(id: @province_id)
+    unless @province
+      flash[:error] = "Invalid province selected. Please choose a valid province."
+      redirect_to cart_path and return
+    end
   
     # Retrieve cart products and calculate subtotal
-    product_ids = session[:cart].keys
+    product_ids = session[:cart]&.keys
+    if product_ids.blank?
+      flash[:error] = "Your cart is empty. Please add items before checking out."
+      redirect_to cart_path and return
+    end
+  
     @cart_products = Product.where(id: product_ids)
-    subtotal = @cart_products.sum { |product| product.price * session[:cart][product.id.to_s].to_i }
+    @subtotal = @cart_products.sum { |product| product.price * session[:cart][product.id.to_s].to_i }
   
-    # Calculate taxes based on the selected province
-    @gst_total = @province.gst ? subtotal * @province.gst : 0
-    @pst_total = @province.pst ? subtotal * @province.pst : 0
-    @hst_total = @province.hst ? subtotal * @province.hst : 0
-    @total_amount = subtotal + @gst_total + @pst_total + @hst_total
-    @subtotal = subtotal
+    # Calculate taxes and total
+    @gst_total = @province.gst ? @subtotal * @province.gst : 0
+    @pst_total = @province.pst ? @subtotal * @province.pst : 0
+    @hst_total = @province.hst ? @subtotal * @province.hst : 0
+    @total_amount = @subtotal + @gst_total + @pst_total + @hst_total
   
-    # Debugging output to verify calculations
+    # Store session data for later use
+    session[:checkout] = [
+      @province.id,
+      @first_name,
+      @last_name,
+      @email,
+      @address,
+      @city,
+      @postal
+    ]
+  
+    # Debugging logs
     Rails.logger.debug("Checkout Calculation - Subtotal: #{@subtotal}, GST: #{@gst_total}, PST: #{@pst_total}, HST: #{@hst_total}, Total: #{@total_amount}")
-    Rails.logger.debug("PST: #{@province.pst}, GST: #{@province.gst}, HST: #{@province.hst}")
+    Rails.logger.debug("Session checkout data: #{session[:checkout].inspect}")
   end
   
-  
+ 
+# app/controllers/home_controller.rb
+def create
+  # Log the session data for debugging
+  Rails.logger.debug "Session checkout data: #{session[:checkout].inspect}"
 
-  def create
-    # Grab the data passed through the session
-    province   = Province.where(:id => session[:checkout][0])
-    first_name = session[:checkout][1]
-    last_name  = session[:checkout][2]
-    email      = session[:checkout][3]
-    address    = session[:checkout][4]
-    city       = session[:checkout][5]
-    postal     = session[:checkout][6]
+  # Check if all required fields are present in session[:checkout]
+  if session[:checkout].nil? || session[:checkout].any?(&:blank?)
+    flash[:error] = "There was an issue with your session data. Please try again."
+    redirect_to cart_path and return
+  end
 
+  # Fetch session data for checkout
+  province_id, first_name, last_name, email, address, city, postal = session[:checkout]
+
+  # Create and save customer record
+  new_customer = Customer.new(
+    first_name: first_name,
+    last_name: last_name,
+    email: email,
+    address: address,
+    city: city,
+    postal_code: postal,
+    province_id: province_id
+  )
+
+  if new_customer.save
+    # Calculate base total from cart items
     total_price = 0
-
-    # Place holder quantity
-    quantity = 1
-
-    # Create a new customer
-    new_customer = Customer.new(:first_name  => first_name,
-                                :last_name   => last_name,
-                                :city        => city,
-                                :postal_code => postal,
-                                :address     => address,
-                                :email       => email)
-
-    new_customer.province = province.first
-    new_customer.save
-
-    # Create an order
-    processing = Status.where(:title => 'Processing').first
-
-    new_order = Order.new
-    new_order.customer = new_customer
-    new_order.gst_rate = new_customer.province.gst unless new_customer.province.gst.nil?
-    new_order.pst_rate = new_customer.province.pst unless new_customer.province.pst.nil?
-    new_order.hst_rate = new_customer.province.hst unless new_customer.province.hst.nil?
-
-    # Create line items for each of the
-    @cart_products.each do |product|
-      new_line_item = LineItem.new(:quantity => quantity,
-                                   :price    => product.price)
-
-      total_price += product.price
-
-      new_line_item.product = product
-      new_line_item.save
+    session[:cart].each do |product_id, quantity|
+      product = Product.find(product_id)
+      total_price += product.price * quantity
     end
 
-    total_price += total_price * new_customer.province.gst unless new_customer.province.gst.nil?
-    total_price += total_price * new_customer.province.pst unless new_customer.province.pst.nil?
-    total_price += total_price * new_customer.province.hst unless new_customer.province.hst.nil?
+    # Fetch province and tax rates
+    province = new_customer.province
+    gst_rate = province&.gst || 0
+    pst_rate = province&.pst || 0
+    hst_rate = province&.hst || 0
 
-    new_order.status = processing
-    new_order.order_total = total_price
-    new_order.save
+    # Calculate tax totals and final order total
+    gst_total = total_price * gst_rate
+    pst_total = total_price * pst_rate
+    hst_total = total_price * hst_rate
+    order_total = total_price + gst_total + pst_total + hst_total
 
-    # Clear the sessions
-    session[:checkout] = nil
-    session[:cart] = nil
+    # Create and save new order
+    new_order = Order.new(
+      customer: new_customer,
+      status: Status.find_by(title: 'Processing'), # Ensure 'Processing' status exists
+      gst_rate: gst_rate,
+      pst_rate: pst_rate,
+      hst_rate: hst_rate,
+      order_total: order_total
+    )
 
-    # Set the flash message
-    flash[:success_message] = "Your order has been placed!"
+    if new_order.save
+      # Clear session data for cart and checkout
+      session[:checkout] = nil
+      session[:cart] = nil
 
-    # Send the user back to the root
-    redirect_to root_path
+      # Display success message and redirect
+      flash[:success] = "Thank you for your order!"
+      redirect_to root_path
+    else
+      # Handle order save failure
+      flash[:error] = "There was an issue saving your order. Please try again."
+      redirect_to cart_path
+    end
+  else
+    # Handle customer save failure
+    flash[:error] = "There was an issue creating your customer profile: #{new_customer.errors.full_messages.join(', ')}"
+    redirect_to cart_path
   end
+
+
+  def paypal_checkout
+    Rails.logger.debug "PayPal Checkout method triggered"
+    
+    # Ensure session[:cart] exists
+    if session[:cart].blank?
+      flash[:error] = "Your cart is empty. Please add items to proceed."
+      redirect_to cart_path and return
+    end
+  
+    # Calculate total
+    product_ids = session[:cart].keys
+    cart_products = Product.where(id: product_ids)
+    subtotal = cart_products.sum { |product| product.price * session[:cart][product.id.to_s].to_i }
+  
+    # Get province and calculate taxes
+    province = Province.find_by(id: session[:checkout][0])
+    gst_total = province&.gst ? subtotal * province.gst : 0
+    pst_total = province&.pst ? subtotal * province.pst : 0
+    hst_total = province&.hst ? subtotal * province.hst : 0
+    total_amount = subtotal + gst_total + pst_total + hst_total
+  
+    Rails.logger.debug "Total Amount: #{total_amount}"
+  
+    # Initialize PayPal payment
+    payment = PayPal::SDK::REST::Payment.new(
+      {
+        intent: "sale",
+        payer: { payment_method: "paypal" },
+        redirect_urls: {
+          return_url: checkout_success_url,
+          cancel_url: checkout_cancel_url
+        },
+        transactions: [
+          {
+            item_list: {
+              items: cart_products.map do |product|
+                {
+                  name: product.name,
+                  sku: product.id.to_s,
+                  price: product.price.to_s,
+                  currency: "CAD",
+                  quantity: session[:cart][product.id.to_s].to_i
+                }
+              end
+            },
+            amount: {
+              total: total_amount.round(2).to_s,
+              currency: "CAD"
+            },
+            description: "GreenShop Order Payment"
+          }
+        ]
+      }
+    )
+  
+    if payment.create
+      Rails.logger.debug "PayPal Payment created successfully: #{payment.id}"
+      redirect_to payment.links.find { |v| v.rel == "approval_url" }.href
+    else
+      Rails.logger.error "PayPal Error: #{payment.error.inspect}"
+      flash[:error] = "An error occurred while processing your PayPal payment."
+      redirect_to cart_path
+    end
+  end
+    
+  
+  def checkout_success
+    payment_id = params[:paymentId]
+    payer_id = params[:PayerID]
+  
+    payment = PayPal::SDK::REST::Payment.find(payment_id)
+  
+    if payment.execute(payer_id: payer_id)
+      # Clear the cart and show success message
+      session[:cart] = nil
+      flash[:success] = "Payment completed successfully. Thank you for your order!"
+      redirect_to orders_path
+    else
+      flash[:error] = "Payment could not be processed. Please try again."
+      redirect_to cart_path
+    end
+  end
+  
+  def checkout_cancel
+    flash[:error] = "Payment was canceled."
+    redirect_to cart_path
+  end
+  
+end
+
+
+ 
 
   def empty_cart
     session[:cart] = nil
@@ -202,4 +332,34 @@ class HomeController < ApplicationController
     redirect_to cart_path
   end
   
+  def thank_you
+  end
+  def test_flash
+    flash[:notice] = "This is a test flash message!"
+    redirect_to root_path
+  end
+end
+
+
+def stripe_checkout
+  # Set your secret key: remember to change this to your live secret key in production
+  Stripe.api_key = Rails.application.credentials.stripe[:secret_key]
+
+  token = params[:stripe_token]
+
+  begin
+    charge = Stripe::Charge.create({
+      amount: (total + gst_total + pst_total + hst_total) * 100, # Amount in cents
+      currency: 'cad',
+      description: 'Order Payment',
+      source: token,
+    })
+
+    if charge.paid
+      # Update order status, etc.
+    end
+  rescue Stripe::CardError => e
+    flash[:error] = e.message
+    redirect_to new_charge_path
+  end
 end

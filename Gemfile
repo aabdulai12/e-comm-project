@@ -9,6 +9,8 @@ gem 'redis-rails'
 gem 'httparty'
 # Gemfile
 gem 'nokogiri', '1.13.1'
+gem 'stripe'
+gem 'dotenv-rails', groups: [:development, :test]
 
 gem 'redis-rails'
 gem 'dotenv-rails', groups: [:development, :test]
@@ -16,6 +18,10 @@ gem 'dotenv-rails', groups: [:development, :test]
 # Core dependencies
 gem 'excon', '~> 0.80'
 gem 'ransack'              # Replacement for meta_search
+gem 'paypal-checkout-sdk'
+gem 'paypal-sdk-rest'
+gem 'stripe'
+
 
 # JavaScript and CSS Assets
 gem 'coffee-rails', '~> 5.0'

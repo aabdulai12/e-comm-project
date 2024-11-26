@@ -24,9 +24,10 @@
         <% end %>
       </tbody>
     </table>
-    <p>GST: <%= number_to_currency(order.gst_amount) %></p>
-    <p>PST: <%= number_to_currency(order.pst_amount) %></p>
-    <p>HST: <%= number_to_currency(order.hst_amount) %></p>
-    <p><strong>Grand Total: <%= number_to_currency(order.total_amount) %></strong></p>
+
+    <p>GST: <%= number_to_currency(order.instance_variable_get(:@gst_amount)) %></p>
+    <p>PST: <%= number_to_currency(order.instance_variable_get(:@pst_amount)) %></p>
+    <p>HST: <%= number_to_currency(order.instance_variable_get(:@hst_amount)) %></p>
+    <p><strong>Grand Total: <%= number_to_currency(order.instance_variable_get(:@total_amount)) %></strong></p>
   </div>
 <% end %>
