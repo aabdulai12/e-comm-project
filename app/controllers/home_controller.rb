@@ -311,10 +311,14 @@ end
   
 
   def remove_product
-    id = params[:id].to_i
-    session[:cart].delete(id)
-    flash[:error_message] = "The product has been removed from your cart!"
-    redirect_to cart_path
+    product_id = params[:id].to_s
+    if session[:cart] && session[:cart][product_id]
+      session[:cart].delete(product_id)
+      flash[:notice] = "Product successfully removed from your cart."
+    else
+      flash[:alert] = "Product not found in your cart."
+    end
+    redirect_back(fallback_location: root_path)
   end
 
   def update_cart
