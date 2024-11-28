@@ -7,6 +7,15 @@ RailsEcommProject::Application.routes.draw do
   # CKEditor
   mount Ckeditor::Engine => '/ckeditor'
 
+
+# add routes for orders
+    resources :orders, only: [:index, :show] do
+     member do
+     patch :mark_as_paid
+    end
+  end
+
+
   # Root route
   root 'home#index' # Defines the homepage
   post 'place_order', to: 'home#place_order', as: 'place_order'

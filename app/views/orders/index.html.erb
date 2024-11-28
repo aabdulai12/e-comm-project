@@ -1,28 +1,27 @@
-<!-- app/views/orders/index.html.erb -->
 <h1>My Orders</h1>
 
-<table class="table table-striped">
+<table class="table">
   <thead>
     <tr>
       <th>Order ID</th>
       <th>Status</th>
       <th>Total</th>
-      <th>Date</th>
+      <th>Placed On</th>
       <th>Actions</th>
     </tr>
   </thead>
   <tbody>
     <% @orders.each do |order| %>
       <tr>
-        <td><%= order.id %></td>
+        <td><%= link_to order.id, order_path(order) %></td>
         <td><%= order.status.title.capitalize %></td>
         <td><%= number_to_currency(order.total) %></td>
         <td><%= order.created_at.strftime("%d %B %Y") %></td>
         <td>
-          <% if order.status == "unpaid" %>
-            <%= link_to "Pay Now", order_payment_path(order), class: "btn btn-warning" %>
+          <% if order.status.title == 'unpaid' %>
+            <%= link_to 'Mark as Paid', mark_as_paid_order_path(order), method: :patch, class: 'btn btn-success' %>
           <% else %>
-            <span class="text-success">Paid</span>
+            Paid
           <% end %>
         </td>
       </tr>

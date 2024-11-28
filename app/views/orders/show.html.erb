@@ -1,4 +1,28 @@
-<!-- app/views/orders/show.html.erb -->
-<h2>Invoice for Order <%= @order.id %></h2>
-<p>Status: <%= @order.status.capitalize %></p>
-<%# Display other order details %>
+<h1>Order Details</h1>
+
+<p><strong>Order ID:</strong> <%= @order.id %></p>
+<p><strong>Status:</strong> <%= @order.status.title.capitalize %></p>
+<p><strong>Total:</strong> <%= number_to_currency(@order.total) %></p>
+<p><strong>Placed On:</strong> <%= @order.created_at.strftime("%d %B %Y") %></p>
+
+<h2>Items</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Product</th>
+      <th>Quantity</th>
+      <th>Price</th>
+      <th>Subtotal</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @order.order_items.each do |item| %>
+      <tr>
+        <td><%= item.product.name %></td>
+        <td><%= item.quantity %></td>
+        <td><%= number_to_currency(item.price) %></td>
+        <td><%= number_to_currency(item.price * item.quantity) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
