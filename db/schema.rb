@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_11_28_092654) do
+ActiveRecord::Schema.define(version: 2024_11_28_111014) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string "resource_id", null: false
