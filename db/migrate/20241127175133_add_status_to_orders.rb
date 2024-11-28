@@ -1,5 +1,5 @@
 class AddStatusToOrders < ActiveRecord::Migration[6.1]
   def change
-    add_column :orders, :status, :string, default: 'unpaid'
+    add_reference :orders, :status, null: false, foreign_key: true
   end
 end

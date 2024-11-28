@@ -177,70 +177,6 @@ class HomeController < ApplicationController
   end
 
 
-  def paypal_checkout
-    Rails.logger.debug "PayPal Checkout method triggered"
-    
-    # Ensure session[:cart] exists
-    if session[:cart].blank?
-      flash[:error] = "Your cart is empty. Please add items to proceed."
-      redirect_to cart_path and return
-    end
-  
-    # Calculate total
-    product_ids = session[:cart].keys
-    cart_products = Product.where(id: product_ids)
-    subtotal = cart_products.sum { |product| product.price * session[:cart][product.id.to_s].to_i }
-  
-    # Get province and calculate taxes
-    province = Province.find_by(id: session[:checkout][0])
-    gst_total = province&.gst ? subtotal * province.gst : 0
-    pst_total = province&.pst ? subtotal * province.pst : 0
-    hst_total = province&.hst ? subtotal * province.hst : 0
-    total_amount = subtotal + gst_total + pst_total + hst_total
-  
-    Rails.logger.debug "Total Amount: #{total_amount}"
-  
-    # Initialize PayPal payment
-    payment = PayPal::SDK::REST::Payment.new(
-      {
-        intent: "sale",
-        payer: { payment_method: "paypal" },
-        redirect_urls: {
-          return_url: checkout_success_url,
-          cancel_url: checkout_cancel_url
-        },
-        transactions: [
-          {
-            item_list: {
-              items: cart_products.map do |product|
-                {
-                  name: product.name,
-                  sku: product.id.to_s,
-                  price: product.price.to_s,
-                  currency: "CAD",
-                  quantity: session[:cart][product.id.to_s].to_i
-                }
-              end
-            },
-            amount: {
-              total: total_amount.round(2).to_s,
-              currency: "CAD"
-            },
-            description: "GreenShop Order Payment"
-          }
-        ]
-      }
-    )
-  
-    if payment.create
-      Rails.logger.debug "PayPal Payment created successfully: #{payment.id}"
-      redirect_to payment.links.find { |v| v.rel == "approval_url" }.href
-    else
-      Rails.logger.error "PayPal Error: #{payment.error.inspect}"
-      flash[:error] = "An error occurred while processing your PayPal payment."
-      redirect_to cart_path
-    end
-  end
     
   
   def checkout_success
@@ -275,6 +211,14 @@ class HomeController < ApplicationController
     redirect_to cart_path and return
   end
 
+  # Find or set unpaid status
+  unpaid_status = Status.find_by(title: 'unpaid') # Ensure this status exists in your database
+
+  unless unpaid_status
+    flash[:error] = "Order status 'unpaid' not found. Please contact support."
+    redirect_to cart_path and return
+  end
+
   # Calculate totals
   subtotal = @cart_products.sum do |product|
     quantity = session[:cart][product.id.to_s].to_i
@@ -288,7 +232,7 @@ class HomeController < ApplicationController
   total = subtotal + gst_total + pst_total + hst_total
 
   # Create and save the order
-  order = current_user.orders.create(
+  order = current_user.orders.new(
     first_name: params[:first_name],
     last_name: params[:last_name],
     email: params[:email],
@@ -300,25 +244,34 @@ class HomeController < ApplicationController
     gst: gst_total,
     pst: pst_total,
     hst: hst_total,
-    total: total,
-    status: "unpaid"
+    order_total: total,
+    status: unpaid_status # Associate with unpaid status
   )
 
-  # Add order items
-  session[:cart].each do |product_id, quantity|
-    product = Product.find(product_id)
-    order.order_items.create(
-      product: product,
-      quantity: quantity,
-      price: product.price
-    )
-  end
+  if order.save
+    # Add order items
+    session[:cart].each do |product_id, quantity|
+      product = Product.find(product_id)
+      order.order_items.create(
+        product: product,
+        quantity: quantity,
+        price: product.price
+      )
+    end
 
-  # Clear the cart session and redirect
-  session[:cart] = nil
-  flash[:success] = "Order placed successfully! You can complete the payment anytime."
-  redirect_to orders_path
+    # Clear the cart session and redirect
+    session[:cart] = nil
+    flash[:success] = "Order placed successfully! You can complete the payment anytime."
+    redirect_to orders_path
+  else
+    flash[:error] = "There was an issue placing your order: #{order.errors.full_messages.join(', ')}"
+    redirect_to cart_path
   end
+end
+
+  
+  
+  
 
   def empty_cart
     session[:cart] = nil

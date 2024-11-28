@@ -15,7 +15,7 @@
     <% @orders.each do |order| %>
       <tr>
         <td><%= order.id %></td>
-        <td><%= order.status.capitalize %></td>
+        <td><%= order.status.title.capitalize %></td>
         <td><%= number_to_currency(order.total) %></td>
         <td><%= order.created_at.strftime("%d %B %Y") %></td>
         <td>

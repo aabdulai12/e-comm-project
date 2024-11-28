@@ -21,6 +21,8 @@ puts "Categories seeded: #{category_records.map(&:name).join(', ')}"
   #puts "Faker product created: #{product.name} in category #{product.category.name}"
 #end
 
+
+
 # Seed from CSV file (if using CSV data)
 csv_path = Rails.root.join('db', 'products.csv')
 if File.exist?(csv_path)
@@ -79,3 +81,8 @@ Province.find_by(name: 'Yukon').update(gst: 0.05, pst: 0, hst: 0)
 
 
 puts "All provinces and territories updated with tax rates."
+
+
+
+Status.find_or_create_by(title: 'unpaid')
+Status.find_or_create_by(title: 'paid')
