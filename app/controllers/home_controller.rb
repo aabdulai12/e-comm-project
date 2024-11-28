@@ -1,4 +1,7 @@
 class HomeController < ApplicationController
+  before_action :authenticate_user! # Ensure user is logged in
+  before_action :set_cart, only: [:checkout, :place_order]
+
 
   def index # 
     @products   = Product.order("id DESC").limit(9).page(params[:page]).per(3)
@@ -48,13 +51,17 @@ class HomeController < ApplicationController
 
   end
 
-  
+
+
+
+  # Initialize or retrieve the user's cart
+  def set_cart
+    session[:cart] ||= {} # Ensure session[:cart] is always a hash
+    product_ids = session[:cart].keys
+    @cart_products = Product.where(id: product_ids)
+  end
   
   def checkout
-      Rails.logger.info "Stripe Public Key: #{Rails.application.credentials.dig(:stripe, :public_key)}"
-    # Ensure session checkout details are reset
-    session[:checkout] = []
-  
     # Fetch user input from params
     @first_name = params[:first_name]
     @last_name = params[:last_name]
@@ -64,57 +71,39 @@ class HomeController < ApplicationController
     @email = params[:email]
     @postal = params[:postal]
   
-
-    
-
     # Validate that all fields are provided
     if [@first_name, @last_name, @address, @province_id, @city, @email, @postal].any?(&:blank?)
       flash[:error] = "Please fill in all required fields."
       redirect_to cart_path and return
     end
   
-    # Find and set @province
+    # Retrieve the selected province
     @province = Province.find_by(id: @province_id)
     unless @province
       flash[:error] = "Invalid province selected. Please choose a valid province."
       redirect_to cart_path and return
     end
   
-    # Retrieve cart products and calculate subtotal
-    product_ids = session[:cart]&.keys
-    if product_ids.blank?
-      flash[:error] = "Your cart is empty. Please add items before checking out."
-      redirect_to cart_path and return
+    # Calculate the subtotal and taxes
+    @subtotal = @cart_products.sum do |product|
+      quantity = session[:cart][product.id.to_s].to_i
+      product.price * quantity
     end
   
-    @cart_products = Product.where(id: product_ids)
-    @subtotal = @cart_products.sum { |product| product.price * session[:cart][product.id.to_s].to_i }
-  
-    # Calculate taxes and total
-    @gst_total = @province.gst ? @subtotal * @province.gst : 0
-    @pst_total = @province.pst ? @subtotal * @province.pst : 0
-    @hst_total = @province.hst ? @subtotal * @province.hst : 0
+    @gst_total = @subtotal * (@province.gst || 0)
+    @pst_total = @subtotal * (@province.pst || 0)
+    @hst_total = @subtotal * (@province.hst || 0)
     @total_amount = @subtotal + @gst_total + @pst_total + @hst_total
   
-    # Store session data for later use
-    session[:checkout] = [
-      @province.id,
-      @first_name,
-      @last_name,
-      @email,
-      @address,
-      @city,
-      @postal
-    ]
-  
-    # Debugging logs
-    Rails.logger.debug("Checkout Calculation - Subtotal: #{@subtotal}, GST: #{@gst_total}, PST: #{@pst_total}, HST: #{@hst_total}, Total: #{@total_amount}")
-    Rails.logger.debug("Session checkout data: #{session[:checkout].inspect}")
+    # Debugging logs for validation
+    Rails.logger.debug "Checkout details: Subtotal=#{@subtotal}, GST=#{@gst_total}, PST=#{@pst_total}, HST=#{@hst_total}, Total=#{@total_amount}"
   end
   
+  
+  
  
-# app/controllers/home_controller.rb
-def create
+  # app/controllers/home_controller.rb
+  def create
   # Log the session data for debugging
   Rails.logger.debug "Session checkout data: #{session[:checkout].inspect}"
 
@@ -276,10 +265,60 @@ def create
     redirect_to cart_path
   end
   
-end
+  end
 
 
- 
+  def place_order
+  # Validate form inputs
+  if session[:cart].blank? || [params[:first_name], params[:last_name], params[:address], params[:province], params[:city], params[:email], params[:postal]].any?(&:blank?)
+    flash[:error] = "Please fill in all required fields and ensure your cart is not empty."
+    redirect_to cart_path and return
+  end
+
+  # Calculate totals
+  subtotal = @cart_products.sum do |product|
+    quantity = session[:cart][product.id.to_s].to_i
+    product.price * quantity
+  end
+
+  province = Province.find(params[:province])
+  gst_total = subtotal * (province.gst || 0)
+  pst_total = subtotal * (province.pst || 0)
+  hst_total = subtotal * (province.hst || 0)
+  total = subtotal + gst_total + pst_total + hst_total
+
+  # Create and save the order
+  order = current_user.orders.create(
+    first_name: params[:first_name],
+    last_name: params[:last_name],
+    email: params[:email],
+    address: params[:address],
+    city: params[:city],
+    postal_code: params[:postal],
+    province: province,
+    subtotal: subtotal,
+    gst: gst_total,
+    pst: pst_total,
+    hst: hst_total,
+    total: total,
+    status: "unpaid"
+  )
+
+  # Add order items
+  session[:cart].each do |product_id, quantity|
+    product = Product.find(product_id)
+    order.order_items.create(
+      product: product,
+      quantity: quantity,
+      price: product.price
+    )
+  end
+
+  # Clear the cart session and redirect
+  session[:cart] = nil
+  flash[:success] = "Order placed successfully! You can complete the payment anytime."
+  redirect_to orders_path
+  end
 
   def empty_cart
     session[:cart] = nil
@@ -342,10 +381,10 @@ end
     flash[:notice] = "This is a test flash message!"
     redirect_to root_path
   end
-end
+  end
 
 
-def stripe_checkout
+  def stripe_checkout
   # Set your secret key: remember to change this to your live secret key in production
   Stripe.api_key = Rails.application.credentials.stripe[:secret_key]
 

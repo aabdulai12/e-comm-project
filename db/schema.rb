@@ -10,17 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-
-
-#price Preservation: Prices are recorded in the Line Items table at the time of the transaction, 
-#ensuring that any future changes to product pricing do not affect historical order data.
-
-#Tax Rate Preservation: Tax rates are stored with each order, allowing you to see exactly what tax rates were applied at the time of each purchase.
-
-
-
-ActiveRecord::Schema.define(version: 2024_11_13_160101) do
+ActiveRecord::Schema.define(version: 2024_11_28_070605) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string "resource_id", null: false
@@ -82,6 +72,13 @@ ActiveRecord::Schema.define(version: 2024_11_13_160101) do
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
 
+  create_table "carts", force: :cascade do |t|
+    t.integer "user_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_carts_on_user_id"
+  end
+
   create_table "categories", force: :cascade do |t|
     t.string "title"
     t.datetime "created_at", precision: 6, null: false
@@ -136,6 +133,20 @@ ActiveRecord::Schema.define(version: 2024_11_13_160101) do
     t.float "order_total"
     t.integer "status_id"
     t.integer "user_id"
+    t.string "first_name"
+    t.string "last_name"
+    t.string "address"
+    t.string "city"
+    t.string "postal_code"
+    t.string "email"
+    t.integer "province_id"
+    t.string "postal"
+    t.decimal "subtotal"
+    t.decimal "gst"
+    t.decimal "pst"
+    t.decimal "hst"
+    t.decimal "total"
+    t.string "status"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
@@ -197,10 +208,13 @@ ActiveRecord::Schema.define(version: 2024_11_13_160101) do
     t.string "address"
     t.string "city"
     t.integer "province_id"
+    t.string "first_name"
+    t.string "last_name"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "carts", "users"
 end

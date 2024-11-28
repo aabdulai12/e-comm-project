@@ -93,27 +93,7 @@
   <h2>Payment Options</h2>
 <p>Choose your preferred payment method:</p>
 
-<script src="https://js.stripe.com/v3/"></script>
-<script>
-  var stripe = Stripe('<%= Rails.application.credentials.stripe[:public_key] %>');
-  var elements = stripe.elements();
-  var card = elements.create('card');
-  card.mount('#card-element');
 
-  var form = document.getElementById('payment-form');
-  form.addEventListener('submit', function(event) {
-    event.preventDefault();
-
-    stripe.createToken(card).then(function(result) {
-      if (result.error) {
-        console.log(result.error.message);
-      } else {
-        document.getElementById('stripe_token').value = result.token.id;
-        form.submit();
-      }
-    });
-  });
-</script>
 
 <hr>
 

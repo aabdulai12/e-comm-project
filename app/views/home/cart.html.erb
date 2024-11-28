@@ -48,19 +48,19 @@
             <% end %>
 
             <!-- Remove Button -->
-            <td><%= link_to "Remove", remove_product_path(product.id), class: "btn btn-primary" %></td>
+            <td><%= link_to "Remove", remove_product_path(product.id), method: :delete, class: "btn btn-primary" %></td>
           </tr>
         <% end %>
         <tr>
           <td colspan="2"></td>
-          <td>Total:</td>
+          <td><strong>Total:</strong></td>
           <td><%= number_to_currency total %></td>
           <td></td>
         </tr>
         <tr>
           <td colspan="4"></td>
           <td>
-            <%= link_to "Empty Cart", empty_cart_path, class: "btn btn-danger" %>
+            <%= link_to "Empty Cart", empty_cart_path, method: :delete, class: "btn btn-danger" %>
           </td>
         </tr>
       </tbody>
@@ -68,7 +68,7 @@
 
     <!-- Checkout Form -->
     <h2>Order Details</h2>
-    <%= form_tag(checkout_path, method: :post) do %>
+    <%= form_with url: place_order_path, method: :post, local: true do %>
       <table class="table">
         <tr>
           <td><%= label_tag :first_name, "First Name" %></td>
@@ -84,8 +84,7 @@
         </tr>
         <tr>
           <td><%= label_tag :province, "Province" %></td>
-          <td><%= select_tag :province, options_from_collection_for_select(@provinces, "id", "name"), class: "form-control" %></td>
-
+          <td><%= select_tag :province, options_from_collection_for_select(@provinces, "id", "name"), class: "form-control", required: true %></td>
         </tr>
         <tr>
           <td><%= label_tag :city, "City" %></td>
@@ -100,7 +99,9 @@
           <td><%= text_field_tag :postal, nil, class: "form-control", required: true %></td>
         </tr>
       </table>
-      <%= submit_tag 'Checkout', class: "btn btn-success" %>
+      <div class="text-right">
+        <%= submit_tag 'Place Order', class: "btn btn-success btn-lg" %>
+      </div>
     <% end %>
   </div><!-- /example -->
 <% end %>

@@ -1,0 +1,6 @@
+<h2>Order Preview</h2>
+<%= form_with(model: @order, url: orders_path, method: :post) do |form| %>
+  <!-- Display all the order details here -->
+  <%# Display product details, quantities, and prices %>
+  <%= submit_tag 'Confirm Order', class: "btn btn-success" %>
+<% end %>

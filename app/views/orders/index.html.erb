@@ -1,33 +1,31 @@
-<h2>My Orders</h2>
+<!-- app/views/orders/index.html.erb -->
+<h1>My Orders</h1>
 
-<% @orders.each do |order| %>
-  <div class="order">
-    <h3>Order ##{order.id}</h3>
-    <p>Date: <%= order.created_at.strftime("%Y-%m-%d") %></p>
-    <p>Province: <%= order.province.name %></p>
-
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Product</th>
-          <th>Quantity</th>
-          <th>Price</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% order.line_items.each do |line_item| %>
-          <tr>
-            <td><%= line_item.product.name %></td>
-            <td><%= line_item.quantity %></td>
-            <td><%= number_to_currency(line_item.price) %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-
-    <p>GST: <%= number_to_currency(order.instance_variable_get(:@gst_amount)) %></p>
-    <p>PST: <%= number_to_currency(order.instance_variable_get(:@pst_amount)) %></p>
-    <p>HST: <%= number_to_currency(order.instance_variable_get(:@hst_amount)) %></p>
-    <p><strong>Grand Total: <%= number_to_currency(order.instance_variable_get(:@total_amount)) %></strong></p>
-  </div>
-<% end %>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Order ID</th>
+      <th>Status</th>
+      <th>Total</th>
+      <th>Date</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @orders.each do |order| %>
+      <tr>
+        <td><%= order.id %></td>
+        <td><%= order.status.capitalize %></td>
+        <td><%= number_to_currency(order.total) %></td>
+        <td><%= order.created_at.strftime("%d %B %Y") %></td>
+        <td>
+          <% if order.status == "unpaid" %>
+            <%= link_to "Pay Now", order_payment_path(order), class: "btn btn-warning" %>
+          <% else %>
+            <span class="text-success">Paid</span>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
