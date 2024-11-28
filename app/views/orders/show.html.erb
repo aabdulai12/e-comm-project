@@ -1,18 +1,64 @@
 <h1>Order Details</h1>
 
-<p><strong>Order ID:</strong> <%= @order.id %></p>
-<p><strong>Status:</strong> <%= @order.status.title.capitalize %></p>
-<p><strong>Total:</strong> <%= number_to_currency(@order.total) %></p>
-<p><strong>Placed On:</strong> <%= @order.created_at.strftime("%d %B %Y") %></p>
+<table class="table table-bordered">
+  <tr>
+    <th>First Name</th>
+    <td><%= @order.first_name %></td>
+  </tr>
+  <tr>
+    <th>Last Name</th>
+    <td><%= @order.last_name %></td>
+  </tr>
+  <tr>
+    <th>Email</th>
+    <td><%= @order.email %></td>
+  </tr>
+  <tr>
+    <th>Address</th>
+    <td><%= @order.address %></td>
+  </tr>
+  <tr>
+    <th>City</th>
+    <td><%= @order.city %></td>
+  </tr>
+  <tr>
+    <th>Province</th>
+    <td><%= @order.province.name %></td>
+  </tr>
+  <tr>
+    <th>Postal Code</th>
+    <td><%= @order.postal_code %></td>
+  </tr>
+  <tr>
+    <th>Subtotal</th>
+    <td><%= number_to_currency(@order.subtotal) %></td>
+  </tr>
+  <tr>
+    <th>GST</th>
+    <td><%= number_to_currency(@order.gst) %></td>
+  </tr>
+  <tr>
+    <th>PST</th>
+    <td><%= number_to_currency(@order.pst) %></td>
+  </tr>
+  <tr>
+    <th>HST</th>
+    <td><%= number_to_currency(@order.hst) %></td>
+  </tr>
+  <tr>
+    <th>Total</th>
+    <td><%= number_to_currency(@order.total) %></td>
+  </tr>
+</table>
 
-<h2>Items</h2>
-<table class="table">
+<h2>Order Items</h2>
+<table class="table table-striped">
   <thead>
     <tr>
       <th>Product</th>
       <th>Quantity</th>
       <th>Price</th>
-      <th>Subtotal</th>
+      <th>Total</th>
     </tr>
   </thead>
   <tbody>
@@ -26,3 +72,5 @@
     <% end %>
   </tbody>
 </table>
+
+<%= link_to 'Proceed to Checkout', checkout_path(order_id: @order.id), class: "btn btn-primary" %>

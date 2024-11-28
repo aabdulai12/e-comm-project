@@ -18,6 +18,8 @@
         <td><%= number_to_currency(order.total) %></td>
         <td><%= order.created_at.strftime("%d %B %Y") %></td>
         <td>
+        <td><%= link_to 'View Details', order_path(order), class: 'btn btn-info' %></td>
+        
           <% if order.status.title == 'unpaid' %>
             <%= link_to 'Mark as Paid', mark_as_paid_order_path(order), method: :patch, class: 'btn btn-success' %>
           <% else %>

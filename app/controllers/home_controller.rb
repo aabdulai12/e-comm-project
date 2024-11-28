@@ -62,6 +62,7 @@ class HomeController < ApplicationController
   end
   
   def checkout
+    @order = current_user.orders.find(params[:order_id])
     # Fetch user input from params
     @first_name = params[:first_name]
     @last_name = params[:last_name]

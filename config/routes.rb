@@ -38,6 +38,7 @@ RailsEcommProject::Application.routes.draw do
   get 'checkout/success', to: 'home#checkout_success', as: 'checkout_success'
   get 'checkout/cancel', to: 'home#checkout_cancel', as: 'checkout_cancel'
   post 'checkout', to: 'home#checkout', as: 'process_checkout'
+  post 'checkout', to: 'home#checkout', as: :checkout
 
   # PayPal route
   post 'paypal_checkout', to: 'home#paypal_checkout', as: 'paypal_checkout'
