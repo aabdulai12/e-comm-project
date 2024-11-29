@@ -1,6 +1,6 @@
 <h1>Order Details</h1>
 
-<table class="table table-bordered">
+<table class="table">
   <tr>
     <th>First Name</th>
     <td><%= @order.first_name %></td>
@@ -22,43 +22,22 @@
     <td><%= @order.city %></td>
   </tr>
   <tr>
-    <th>Province</th>
-    <td><%= @order.province.name %></td>
-  </tr>
-  <tr>
     <th>Postal Code</th>
     <td><%= @order.postal_code %></td>
   </tr>
   <tr>
-    <th>Subtotal</th>
-    <td><%= number_to_currency(@order.subtotal) %></td>
-  </tr>
-  <tr>
-    <th>GST</th>
-    <td><%= number_to_currency(@order.gst) %></td>
-  </tr>
-  <tr>
-    <th>PST</th>
-    <td><%= number_to_currency(@order.pst) %></td>
-  </tr>
-  <tr>
-    <th>HST</th>
-    <td><%= number_to_currency(@order.hst) %></td>
-  </tr>
-  <tr>
-    <th>Total</th>
-    <td><%= number_to_currency(@order.total) %></td>
+    <th>Province</th>
+    <td><%= @order.province.name %></td>
   </tr>
 </table>
 
-<h2>Order Items</h2>
-<table class="table table-striped">
+<h2>Products</h2>
+<table class="table">
   <thead>
     <tr>
-      <th>Product</th>
+      <th>Item</th>
       <th>Quantity</th>
       <th>Price</th>
-      <th>Total</th>
     </tr>
   </thead>
   <tbody>
@@ -67,10 +46,36 @@
         <td><%= item.product.name %></td>
         <td><%= item.quantity %></td>
         <td><%= number_to_currency(item.price) %></td>
-        <td><%= number_to_currency(item.price * item.quantity) %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
+
+<% taxes = @order.calculate_taxes %>
+
+<h3>Totals</h3>
+<table class="table">
+  <tr>
+    <th>Sub Total:</th>
+    <td><%= number_to_currency(taxes[:subtotal]) %></td>
+  </tr>
+  <tr>
+    <th>GST:</th>
+    <td><%= number_to_currency(taxes[:gst]) %></td>
+  </tr>
+  <tr>
+    <th>PST:</th>
+    <td><%= number_to_currency(taxes[:pst]) %></td>
+  </tr>
+  <tr>
+    <th>HST:</th>
+    <td><%= number_to_currency(taxes[:hst]) %></td>
+  </tr>
+  <tr>
+    <th>Total:</th>
+    <td><%= number_to_currency(taxes[:total]) %></td>
+  </tr>
+</table>
+
 
 <%= link_to 'Proceed to Checkout', checkout_path(order_id: @order.id), class: "btn btn-primary" %>

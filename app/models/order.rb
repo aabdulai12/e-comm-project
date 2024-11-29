@@ -24,4 +24,20 @@ class Order < ActiveRecord::Base
 
 
   #attr_accessible :gst_rate, :hst_rate, :pst_rate, :status_id, :order_total, :customer_id
+
+  def calculate_taxes
+    gst_rate = province.gst || 0
+    pst_rate = province.pst || 0
+    hst_rate = province.hst || 0
+
+    subtotal = order_items.sum { |item| item.quantity * item.price }
+
+    gst = subtotal * gst_rate
+    pst = subtotal * pst_rate
+    hst = subtotal * hst_rate
+
+    total = subtotal + gst + pst + hst
+
+    { subtotal: subtotal, gst: gst, pst: pst, hst: hst, total: total }
+  end
 end

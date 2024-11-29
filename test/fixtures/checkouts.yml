@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  cart: one
+  address: one
+  payment_method: MyString
+  shipping_method: MyString
+  payment_status: MyString
+  note: MyText
+
+two:
+  user: two
+  cart: two
+  address: two
+  payment_method: MyString
+  shipping_method: MyString
+  payment_status: MyString
+  note: MyText
