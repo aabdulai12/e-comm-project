@@ -10,6 +10,14 @@ class OrdersController < ApplicationController
   # Show a specific order's details
   def show
     @order = current_user.orders.find(params[:id])
+
+    # Calculate taxes and totals dynamically
+    @province = @order.province
+    @subtotal = @order.subtotal || @order.order_items.sum { |item| item.quantity * item.price }
+    @gst = @subtotal * (@province.gst || 0)
+    @pst = @subtotal * (@province.pst || 0)
+    @hst = @subtotal * (@province.hst || 0)
+    @total = @subtotal + @gst + @pst + @hst
   end
 
   # Mark an order as paid

@@ -1,4 +1,3 @@
-#require 'faker'
 require 'csv'
 
 # Define Categories
@@ -9,24 +8,10 @@ category_records = categories.map { |category| Category.find_or_create_by(name: 
 
 puts "Categories seeded: #{category_records.map(&:name).join(', ')}"
 
-# Seed with Faker (e.g., 100 products)
-#100.times do
-  #product = Product.create!(
-   # name: Faker::Commerce.product_name,
-   # description: Faker::Lorem.sentence(word_count: 15),
-   # price: Faker::Commerce.price(range: 10.0..1000.0),
-   # category: category_records.sample,
-  #  stock_quantity: rand(1..50)
-  #)
-  #puts "Faker product created: #{product.name} in category #{product.category.name}"
-#end
-
-
-
-# Seed from CSV file (if using CSV data)
+# Seed products from CSV file (if CSV data is available)
 csv_path = Rails.root.join('db', 'products.csv')
 if File.exist?(csv_path)
-  puts "CSV file found at #{csv_path}, starting import."
+  puts "CSV file found at #{csv_path}, starting import..."
   CSV.foreach(csv_path, headers: true) do |row|
     category = Category.find_or_create_by(name: row['category'])
     product = Product.create!(
@@ -34,55 +19,48 @@ if File.exist?(csv_path)
       description: row['description'],
       price: row['price'].to_f,
       category: category,
-      stock_quantity: rand(1..50)
+      stock_quantity: rand(1..50) # You can remove this if stock_quantity exists in your CSV
     )
     puts "CSV product created: #{product.name} in category #{product.category.name}"
   end
 else
-  puts "CSV file not found at #{csv_path}"
+  puts "CSV file not found at #{csv_path}. Please provide the CSV file to seed products."
 end
 
-puts "Seeding completed successfully!"
-Province.create([
-  { name: 'Alberta' },
-  { name: 'British Columbia' },
-  { name: 'Manitoba' },
-  { name: 'New Brunswick' },
-  { name: 'Newfoundland and Labrador' },
-  { name: 'Nova Scotia' },
-  { name: 'Ontario' },
-  { name: 'Prince Edward Island' },
-  { name: 'Quebec' },
-  { name: 'Saskatchewan' },
-  { name: 'Northwest Territories' },
-  { name: 'Nunavut' },
-  { name: 'Yukon' }
-])
+puts "Products seeding completed successfully!" unless !File.exist?(csv_path)
 
+# Seed Provinces and Territories
+provinces = [
+  { name: 'Alberta', gst: 0.05, pst: 0.0, hst: 0.0 },
+  { name: 'British Columbia', gst: 0.05, pst: 0.07, hst: 0.0 },
+  { name: 'Manitoba', gst: 0.05, pst: 0.07, hst: 0.0 },
+  { name: 'New Brunswick', gst: 0.0, pst: 0.0, hst: 0.15 },
+  { name: 'Newfoundland and Labrador', gst: 0.0, pst: 0.0, hst: 0.15 },
+  { name: 'Nova Scotia', gst: 0.0, pst: 0.0, hst: 0.15 },
+  { name: 'Ontario', gst: 0.0, pst: 0.0, hst: 0.13 },
+  { name: 'Prince Edward Island', gst: 0.0, pst: 0.0, hst: 0.15 },
+  { name: 'Quebec', gst: 0.05, pst: 0.09975, hst: 0.0 },
+  { name: 'Saskatchewan', gst: 0.05, pst: 0.06, hst: 0.0 },
+  { name: 'Northwest Territories', gst: 0.05, pst: 0.0, hst: 0.0 },
+  { name: 'Nunavut', gst: 0.05, pst: 0.0, hst: 0.0 },
+  { name: 'Yukon', gst: 0.05, pst: 0.0, hst: 0.0 }
+]
 
-
-
-
-# Update each province with its GST, PST, and HST rates
-
-Province.find_by(name: 'Alberta').update(gst: 0.05, pst: 0.0, hst: 0)
-Province.find_by(name: 'British Columbia').update(gst: 0.05, pst: 0.07, hst: 0)
-Province.find_by(name: 'Manitoba').update(gst: 0.05, pst: 0.07, hst: 0)
-Province.find_by(name: 'New Brunswick').update(gst: 0, pst: 0, hst: 0.15)
-Province.find_by(name: 'Newfoundland and Labrador').update(gst: 0, pst: 0, hst: 0.15)
-Province.find_by(name: 'Nova Scotia').update(gst: 0, pst: 0, hst: 0.15)
-Province.find_by(name: 'Ontario').update(gst: 0, pst: 0, hst: 0.13)
-Province.find_by(name: 'Prince Edward Island').update(gst: 0, pst: 0, hst: 0.15)
-Province.find_by(name: 'Quebec').update(gst: 0.05, pst: 0.09975, hst: 0)
-Province.find_by(name: 'Saskatchewan').update(gst: 0.05, pst: 0.06, hst: 0)
-Province.find_by(name: 'Northwest Territories').update(gst: 0.05, pst: 0, hst: 0)
-Province.find_by(name: 'Nunavut').update(gst: 0.05, pst: 0, hst: 0)
-Province.find_by(name: 'Yukon').update(gst: 0.05, pst: 0, hst: 0)
-
+provinces.each do |province_data|
+  province = Province.find_or_create_by(name: province_data[:name])
+  province.update!(gst: province_data[:gst], pst: province_data[:pst], hst: province_data[:hst])
+  puts "Province updated: #{province.name} with GST: #{province.gst}, PST: #{province.pst}, HST: #{province.hst}"
+end
 
 puts "All provinces and territories updated with tax rates."
 
+# Seed Order Statuses
+statuses = ["unpaid", "paid"]
+statuses.each do |status_title|
+  status = Status.find_or_create_by(title: status_title) do |s|
+    s.description = "Order is #{status_title}" if status_title == "unpaid"
+  end
+  puts "Status created/updated: #{status.title}"
+end
 
-
-Status.find_or_create_by(title: 'unpaid')
-Status.find_or_create_by(title: 'paid')
+puts "All statuses seeded successfully!"

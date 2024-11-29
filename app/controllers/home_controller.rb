@@ -205,74 +205,46 @@ class HomeController < ApplicationController
   end
 
 
+  
   def place_order
-  # Validate form inputs
-  if session[:cart].blank? || [params[:first_name], params[:last_name], params[:address], params[:province], params[:city], params[:email], params[:postal]].any?(&:blank?)
-    flash[:error] = "Please fill in all required fields and ensure your cart is not empty."
-    redirect_to cart_path and return
-  end
-
-  # Find or set unpaid status
-  unpaid_status = Status.find_by(title: 'unpaid') # Ensure this status exists in your database
-
-  unless unpaid_status
-    flash[:error] = "Order status 'unpaid' not found. Please contact support."
-    redirect_to cart_path and return
-  end
-
-  # Calculate totals
-  subtotal = @cart_products.sum do |product|
-    quantity = session[:cart][product.id.to_s].to_i
-    product.price * quantity
-  end
-
-  province = Province.find(params[:province])
-  gst_total = subtotal * (province.gst || 0)
-  pst_total = subtotal * (province.pst || 0)
-  hst_total = subtotal * (province.hst || 0)
-  total = subtotal + gst_total + pst_total + hst_total
-
-  # Create and save the order
-  order = current_user.orders.new(
-    first_name: params[:first_name],
-    last_name: params[:last_name],
-    email: params[:email],
-    address: params[:address],
-    city: params[:city],
-    postal_code: params[:postal],
-    province: province,
-    subtotal: subtotal,
-    gst: gst_total,
-    pst: pst_total,
-    hst: hst_total,
-    order_total: total,
-    status: unpaid_status # Associate with unpaid status
-  )
-
-  if order.save
-    # Add order items
-    session[:cart].each do |product_id, quantity|
-      product = Product.find(product_id)
-      order.order_items.create(
-        product: product,
-        quantity: quantity,
-        price: product.price
-      )
+    province = Province.find(params[:province])
+    subtotal = @cart_products.sum do |product|
+      quantity = session[:cart][product.id.to_s].to_i
+      product.price * quantity
     end
-
-    # Clear the cart session and redirect
-    session[:cart] = nil
-    flash[:success] = "Order placed successfully! You can complete the payment anytime."
-    redirect_to orders_path
-  else
-    flash[:error] = "There was an issue placing your order: #{order.errors.full_messages.join(', ')}"
-    redirect_to cart_path
+  
+    order = current_user.orders.create(
+      first_name: params[:first_name],
+      last_name: params[:last_name],
+      email: params[:email],
+      address: params[:address],
+      city: params[:city],
+      postal_code: params[:postal],
+      province: province,
+      subtotal: subtotal,
+      status: Status.find_by(title: 'unpaid')
+    )
+  
+    if order.persisted?
+      session[:cart].each do |product_id, quantity|
+        product = Product.find(product_id)
+        order.order_items.create!(
+          product: product,
+          quantity: quantity,
+          price: product.price
+        )
+      end
+  
+      session[:cart] = nil
+      flash[:success] = "Order placed successfully!"
+      redirect_to orders_path
+    else
+      flash[:error] = "There was an issue placing your order: #{order.errors.full_messages.join(', ')}"
+      redirect_to cart_path
+    end
   end
-end
+  
 
-  
-  
-  
 
   def empty_cart
     session[:cart] = nil
