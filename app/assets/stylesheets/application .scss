@@ -13,12 +13,22 @@
  
  */
 // Customize Bulma's color variables
+
+
+
+
 $primary: #00d1b2; // Turquoise, default primary color in Bulma
 $link: #3273dc; // Blue
 $info: #209cee; // Cyan
 $success: #23d160; // Green
 $warning: #ffdd57; // Yellow
 $danger: #ff3860; // Red
+$primary-color: #3498db; // Define the color variable$primary-color: #3498db;
+$secondary-color: #2ecc71;
+$text-color: #333;
+$background-color: #f4f4f4;
+
+
 
 
 
@@ -47,3 +57,55 @@ $danger: #ff3860; // Red
     text-align: center;
   }
   
+  nav {
+    ul {
+      list-style: none;
+  
+      li {
+        display: inline-block;
+  
+        a {
+          color: $primary-color;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+  
+
+  %button-style {
+    display: inline-block;
+    padding: 10px 15px;
+    border-radius: 5px;
+  }
+  
+  .btn-primary {
+    @extend %button-style;
+    background-color: $primary-color;
+    color: white;
+  }
+  
+  .btn-secondary {
+    @extend %button-style;
+    background-color: $secondary-color;
+    color: white;
+  }
+  
+
+  $base-padding: 10px;
+
+.container {
+  padding: $base-padding * 2;
+}
+
+
+
+@media (max-width: 768px) {
+  .navbar {
+    display: none;
+  }
+
+  .mobile-menu {
+    display: block;
+  }
+}

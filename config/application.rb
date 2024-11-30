@@ -42,4 +42,11 @@ module RailsEcommProject
       require 'dotenv/load'
     end
   end
+
+  module YourAppName
+  class Application < Rails::Application
+    # Add the node_modules folder to the asset load path
+    config.assets.paths << Rails.root.join('node_modules')
+  end
+end
 end

@@ -11,6 +11,8 @@ gem 'httparty'
 gem 'nokogiri', '1.13.1'
 gem 'stripe'
 gem 'dotenv-rails', groups: [:development, :test]
+gem 'bootstrap-sass', '~> 3.3.7'
+gem 'bootstrap', '~> 5.3.0'
 
 gem 'redis-rails'
 gem 'dotenv-rails', groups: [:development, :test]

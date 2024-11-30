@@ -1,14 +1,51 @@
-<!-- app/views/admin/customers/index.html.erb -->
-<h2>Customer Orders</h2>
-<% @customers.each do |customer| %>
-  <h3>Customer: <%= customer.first_name %> <%= customer.last_name %> - <%= customer.email %></h3>
-  <% customer.orders.each do |order| %>
-    <p>Order #<%= order.id %> - Total: <%= number_to_currency(order.order_total) %></p>
-    <ul>
-      <% order.line_items.each do |line_item| %>
-        <li><%= line_item.product.name %> - Qty: <%= line_item.quantity %> - Price: <%= number_to_currency(line_item.price) %></li>
-      <% end %>
-    </ul>
-    <p>GST: <%= number_to_currency(order.gst_amount) %>, PST: <%= number_to_currency(order.pst_amount) %>, HST: <%= number_to_currency(order.hst_amount) %></p>
-  <% end %>
-<% end %>
+<h1>Customer Orders Dashboard</h1>
+
+<table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+      <th>Customer Name</th>
+      <th>Email</th>
+      <th>Orders</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @customers.each do |customer| %>
+      <tr>
+        <td><%= "#{customer.first_name} #{customer.last_name}" %></td>
+        <td><%= customer.email %></td>
+        <td>
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Products</th>
+                <th>Subtotal</th>
+                <th>GST</th>
+                <th>PST</th>
+                <th>HST</th>
+                <th>Grand Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% customer.orders.each do |order| %>
+                <tr>
+                  <td><%= order.id %></td>
+                  <td>
+                    <% order.order_items.each do |item| %>
+                      <p><%= "#{item.quantity}x #{item.product.name} (#{number_to_currency(item.price)})" %></p>
+                    <% end %>
+                  </td>
+                  <td><%= number_to_currency(order.subtotal) %></td>
+                  <td><%= number_to_currency(order.gst) %></td>
+                  <td><%= number_to_currency(order.pst) %></td>
+                  <td><%= number_to_currency(order.hst) %></td>
+                  <td><%= number_to_currency(order.total) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

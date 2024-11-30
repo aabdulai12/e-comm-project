@@ -15,6 +15,9 @@ RailsEcommProject::Application.routes.draw do
     end
   end
 
+  namespace :admin do
+    resources :customers, only: [:index]
+  end
 
   # Root route
   root 'home#index' # Defines the homepage
