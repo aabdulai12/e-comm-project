@@ -1,7 +1,6 @@
 <h1>Order Details</h1>
 
 <table class="table">
-<<<<<<< HEAD
   <tr>
     <th>First Name</th>
     <td><%= @order.first_name %></td>
@@ -36,49 +35,6 @@
 <table class="table">
   <thead>
     <tr>
-=======
-  <thead>
-    <tr>
-      <th colspan="2">Order Details</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>First Name:</strong></td>
-      <td><%= @order.first_name %></td>
-    </tr>
-    <tr>
-      <td><strong>Last Name:</strong></td>
-      <td><%= @order.last_name %></td>
-    </tr>
-    <tr>
-      <td><strong>Email:</strong></td>
-      <td><%= @order.email %></td>
-    </tr>
-    <tr>
-      <td><strong>Address:</strong></td>
-      <td><%= @order.address %></td>
-    </tr>
-    <tr>
-      <td><strong>City:</strong></td>
-      <td><%= @order.city %></td>
-    </tr>
-    <tr>
-      <td><strong>Postal Code:</strong></td>
-      <td><%= @order.postal_code %></td>
-    </tr>
-    <tr>
-      <td><strong>Province:</strong></td>
-      <td><%= @province.name %></td>
-    </tr>
-  </tbody>
-</table>
-
-<h2>Products</h2>
-<table class="table">
-  <thead>
-    <tr>
->>>>>>> origin/master
       <th>Item</th>
       <th>Quantity</th>
       <th>Price</th>
@@ -115,35 +71,9 @@
   </tbody>
 </table>
 
-<<<<<<< HEAD
 <% taxes = @order.calculate_taxes %>
 
-<h3>Totals</h3>
-<table class="table">
-  <tr>
-    <th>Sub Total:</th>
-    <td><%= number_to_currency(taxes[:subtotal]) %></td>
-  </tr>
-  <tr>
-    <th>GST:</th>
-    <td><%= number_to_currency(taxes[:gst]) %></td>
-  </tr>
-  <tr>
-    <th>PST:</th>
-    <td><%= number_to_currency(taxes[:pst]) %></td>
-  </tr>
-  <tr>
-    <th>HST:</th>
-    <td><%= number_to_currency(taxes[:hst]) %></td>
-  </tr>
-  <tr>
-    <th>Total:</th>
-    <td><%= number_to_currency(taxes[:total]) %></td>
-  </tr>
-</table>
+
 
 
 <%= link_to 'Proceed to Checkout', checkout_path(order_id: @order.id), class: "btn btn-primary" %>
-=======
-<%= link_to 'Checkout Payment', new_order_checkout_path(@order), class: 'btn btn-primary' %>
->>>>>>> origin/master
