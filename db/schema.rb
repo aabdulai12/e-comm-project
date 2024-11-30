@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_11_28_111014) do
+ActiveRecord::Schema.define(version: 2024_11_30_033443) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string "resource_id", null: false
@@ -87,6 +87,28 @@ ActiveRecord::Schema.define(version: 2024_11_28_111014) do
     t.string "name"
   end
 
+  create_table "categories_products", id: false, force: :cascade do |t|
+    t.integer "category_id", null: false
+    t.integer "product_id", null: false
+    t.index ["category_id"], name: "index_categories_products_on_category_id"
+    t.index ["product_id"], name: "index_categories_products_on_product_id"
+  end
+
+  create_table "checkouts", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "cart_id"
+    t.integer "address_id"
+    t.string "payment_method"
+    t.string "shipping_method"
+    t.string "payment_status"
+    t.text "note"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["address_id"], name: "index_checkouts_on_address_id"
+    t.index ["cart_id"], name: "index_checkouts_on_cart_id"
+    t.index ["user_id"], name: "index_checkouts_on_user_id"
+  end
+
   create_table "ckeditor_assets", force: :cascade do |t|
     t.string "data_file_name", null: false
     t.string "data_content_type"
@@ -155,7 +177,7 @@ ActiveRecord::Schema.define(version: 2024_11_28_111014) do
     t.decimal "pst"
     t.decimal "hst"
     t.decimal "total"
-    t.string "status"
+    t.string "status", default: "pending"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
@@ -226,4 +248,7 @@ ActiveRecord::Schema.define(version: 2024_11_28_111014) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "carts", "users"
+  add_foreign_key "checkouts", "addresses"
+  add_foreign_key "checkouts", "carts"
+  add_foreign_key "checkouts", "users"
 end

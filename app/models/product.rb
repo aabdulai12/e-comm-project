@@ -2,6 +2,7 @@ class Product < ActiveRecord::Base
   has_many :line_items
   has_many :reviews
   belongs_to :category
+  has_and_belongs_to_many :categories
  
   validates :name,           :presence => true
   validates :description,    :presence => true
