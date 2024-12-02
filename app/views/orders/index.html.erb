@@ -1,33 +1,28 @@
 <h1>My Orders</h1>
 
-<table class="table">
-  <thead>
-    <tr>
-      <th>Order ID</th>
-      <th>Status</th>
-      <th>Total</th>
-      <th>Placed On</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @orders.each do |order| %>
+<% if @orders.present? %>
+  <table class="table">
+    <thead>
       <tr>
-        <td><%= link_to order.id, order_path(order) %></td>
-        <td><%= order.status.title.capitalize %></td>
-        <td><%= number_to_currency(order.total) %></td>
-        <td><%= order.created_at.strftime("%d %B %Y") %></td>
-        <td><%= link_to 'View Details', order_path(order), class: 'btn btn-info' %></td>
-        <td>
-        
-        
-          <% if order.status.title == 'unpaid' %>
-            
-          <% else %>
-          
-          <% end %>
-        </td>
+        <th>Order ID</th>
+        <th>Status</th>
+        <th>Total</th>
+        <th>Placed On</th>
+        <th>Actions</th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% @orders.each do |order| %>
+        <tr>
+          <td><%= link_to order.id, order_path(order) %></td>
+          <td><%= order.status&.title&.capitalize || 'Unknown Status' %></td>
+          <td><%= number_to_currency(order.order_total) %></td>
+          <td><%= order.created_at.strftime("%d %B %Y") %></td>
+          <td><%= link_to 'View Details', order_path(order), class: 'btn btn-info' %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>No orders found. <%= link_to 'Start Shopping', root_path, class: 'btn btn-primary' %></p>
+<% end %>
