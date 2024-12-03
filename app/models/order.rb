@@ -1,31 +1,23 @@
-class Order < ActiveRecord::Base
-  has_many :order_items, dependent: :destroy # Ensures associated items are deleted when the order is deleted
+class Order < ApplicationRecord
+  has_many :order_items, dependent: :destroy
   belongs_to :customer, optional: true
   belongs_to :status
   belongs_to :user, optional: true
-  has_many :line_items
   belongs_to :province
-  has_many :line_items
 
-  validates :status_id,   :presence => true
-  validates :order_total, :presence => true,
-                          :numericality => { :greater_than_or_equal_to => 0 }
+  # Validations
+  validates :status_id, presence: true
+  validates :order_total, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :gst_rate, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :hst_rate, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :pst_rate, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
 
-  validates :gst_rate,    :allow_nil => true,
-                          :numericality => { :greater_than_or_equal_to => 0 }
-  
-  validates :hst_rate,    :allow_nil => true,
-                          :numericality => { :greater_than_or_equal_to => 0 }
- 
-  validates :pst_rate,    :allow_nil => true,
-                          :numericality => { :greater_than_or_equal_to => 0 }        
-
-  validates :order_total, presence: true, numericality: true
-
-
-  #attr_accessible :gst_rate, :hst_rate, :pst_rate, :status_id, :order_total, :customer_id
+  # Callback to calculate order total and ensure province is set
+  before_validation :calculate_totals_and_set_defaults, on: :create
 
   def calculate_taxes
+    return {} unless province
+
     gst_rate = province.gst || 0
     pst_rate = province.pst || 0
     hst_rate = province.hst || 0
@@ -39,5 +31,14 @@ class Order < ActiveRecord::Base
     total = subtotal + gst + pst + hst
 
     { subtotal: subtotal, gst: gst, pst: pst, hst: hst, total: total }
+  end
+
+  private
+
+  def calculate_totals_and_set_defaults
+    return unless province
+
+    totals = calculate_taxes
+    self.order_total = totals[:total]
   end
 end

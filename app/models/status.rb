@@ -1,9 +1,8 @@
-class Status < ActiveRecord::Base
- # attr_accessible :description, :title
+class Status < ApplicationRecord
+  # attr_accessible :description, :title
 
-  has_many :orders
+  has_many :orders, dependent: :destroy
 
   validates :title, presence: true, uniqueness: true
   validates :description, presence: true
-
 end

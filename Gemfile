@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+gem 'rubocop'
+gem 'rubocop-rails'
 # Specify your Rails version
 gem 'rails', '~> 6.1.7'
 # Gemfile
