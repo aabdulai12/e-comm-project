@@ -14,5 +14,5 @@ class Customer < ApplicationRecord
   validates :province_id, presence:     true,
                           numericality: true
 
-  # attr_accessible :address, :city, :email, :first_name, :last_name, :postal_code, :province_id
+ 
 end
