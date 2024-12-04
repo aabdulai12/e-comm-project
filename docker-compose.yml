@@ -1,0 +1,28 @@
+version: "3.8" # Updated version
+
+services:
+  web:
+    build: .
+    command: bundle exec rails s -p 3000 -b '0.0.0.0'
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    environment:
+      RAILS_ENV: production
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: myapp_production
+      MYSQL_USER: myapp
+      MYSQL_PASSWORD: mypassword
+
+volumes:
+  db_data:
+    

@@ -1,75 +1,69 @@
 source 'https://rubygems.org'
 
-gem 'rubocop'
-gem 'rubocop-rails'
-# Specify your Rails version
+# Bundler version
+gem 'bundler', '~> 2.5.22'
+
+# Rails version
 gem 'rails', '~> 6.1.7'
-# Gemfile
-gem 'faker'
-gem 'devise'
-gem 'redis-rails'
-gem 'httparty'
-# Gemfile
-gem 'nokogiri', '1.13.1'
-gem 'stripe'
-gem 'dotenv-rails', groups: [:development, :test]
-gem 'bootstrap-sass', '~> 3.3.7'
-gem 'bootstrap', '~> 5.3.0'
 
-gem 'redis-rails'
-gem 'dotenv-rails', groups: [:development, :test]
 
-# Core dependencies
-gem 'excon', '~> 0.80'
-gem 'ransack'              # Replacement for meta_search
-gem 'paypal-checkout-sdk'
-gem 'paypal-sdk-rest'
-gem 'stripe'
 
+
+# General dependencies
+gem 'faker'                 # Generate fake data for testing
+gem 'devise'                # Authentication solution
+gem 'redis-rails'           # Redis integration for Rails
+gem 'httparty'              # HTTP requests library
+gem 'nokogiri', '1.13.1'    # XML and HTML parsing
+gem 'stripe'                # Payment processing
+gem 'dotenv-rails', groups: [:development, :test] # Environment variable management
 
 # JavaScript and CSS Assets
-gem 'coffee-rails', '~> 5.0'
-gem 'sass-rails', '~> 6.0' # Compatible version for Rails 6
+gem 'bootstrap', '~> 5.3.0' # Bootstrap 5 integration
+gem 'sass-rails', '~> 6.0'  # Sass integration for Rails 6.x
+gem 'jquery-rails', '>= 4.3.1' # jQuery for Rails
+gem 'ffi', '~> 1.15' # Use a compatible version
+# Admin functionality
+gem 'activeadmin', '~> 2.9'   # Admin dashboard
+gem 'ckeditor'                # WYSIWYG editor for content
 
-# ActiveAdmin for admin functionality
-gem 'activeadmin', '~> 2.9'  # Updated to a compatible version with Rails 6.x
+# File uploads
+gem 'paperclip', '~> 6.1'     # File attachment (consider Active Storage for newer apps)
 
-# Dependencies required by ActiveAdmin and Rails 6.x
-gem 'jquery-rails', '>= 4.3.1'  # Update to a compatible version with Rails 6.x
-gem 'addressable', '~> 2.8'
+# Search functionality
+gem 'ransack'                 # Advanced search capabilities
+gem 'scoped_search'           # Scoped search for models
 
-# Paperclip for file uploads (consider switching to Active Storage in Rails 6)
-gem "paperclip", "~> 6.1"   # Updated to the latest version
+# Payment processing
+gem 'paypal-checkout-sdk'     # PayPal SDK for Checkout
+gem 'paypal-sdk-rest'         # PayPal REST SDK
 
-# Other Gems
-gem 'activemerchant'        # Payment processing gem
-gem 'scoped_search'         # Search functionality
-gem 'haml-rails'            # HAML templating for Rails
-gem 'ckeditor'              # WYSIWYG editor
-gem 'devise'
+# Other tools
+gem 'haml-rails'              # HAML templating engine
+gem 'excon', '~> 0.80'        # HTTP client library
+gem 'addressable', '~> 2.8'   # URL parsing library
+gem 'activemerchant'          # Payment gateway integrations
 
-# Heroku support
-#gem 'heroku'
-
-# Assets group
+# JavaScript and CSS compression
 group :assets do
-  gem 'compass'             # CSS authoring framework
-  gem 'uglifier', '>= 1.0.3' # JavaScript compressor
+  gem 'uglifier', '>= 1.0.3'   # JavaScript compressor
 end
 
-# Database adapters
+# Development and testing
 group :development, :test do
-  gem 'sqlite3', '~> 1.4'   # Compatible with Rails 6.x
+  gem 'sqlite3', '~> 1.4'       # SQLite for development and testing
+  gem 'dotenv-rails'            # Manage environment variables
 end
 
+# Production
 group :production do
-  gem 'mysql2', '>= 0.5'    # Use `mysql2` for MySQL in production
-  gem 'thin'
+  gem 'mysql2', '>= 0.5'        # MySQL for production
+  gem 'thin'                    # Lightweight web server
 end
 
-# Optional Dependencies
-# gem 'bcrypt', '~> 3.1.7'   # Uncomment if using has_secure_password
-# gem 'jbuilder'             # JSON responses
-# gem 'unicorn'              # Alternative app server
-# gem 'capistrano'           # For deployment
-# gem 'debug', '>= 1.0.0'    # Debugger for development
+# Linters and coding standards
+gem 'rubocop'                   # Ruby linter
+gem 'rubocop-rails'             # Rails-specific linting
+
+# Remove duplicates
+# Removed extra redis-rails, stripe, devise, and dotenv-rails declarations
