@@ -7,6 +7,6 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   def admin?
-    role == "admin" 
+    role == "admin" # or however you define admin users in your system
   end
 end
